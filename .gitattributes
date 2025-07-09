@@ -1,0 +1,2 @@
+dados/applicants.json filter=lfs diff=lfs merge=lfs -text
+dados/vagas.json filter=lfs diff=lfs merge=lfs -text
