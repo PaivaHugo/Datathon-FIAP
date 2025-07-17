@@ -1,15 +1,21 @@
 import streamlit as st
-import time
 import random
+import joblib
+import pandas as pd
 
-st.title("Análise de candidatos para vagas de trabalho")
+from utils import *
+
+# Carrega o modelo salvo
+@st.cache_resource
+def carregar_modelo():
+    return joblib.load("streamlit/modelo.joblib")
 
 @st.dialog("Resultado da avaliação do candidato")
-def result(status):
-    if status.lower() == "aprovado":
-        st.success("Candidato :green[APROVADO]", icon="✅")
-    elif status.lower() == "reprovado":
-        st.error("Candidato :red[REPROVADO]", icon="❌")
+def result(predict):
+    if predict >= 0.6:
+        st.success(f"Candidato :green[APROVADO] (confiança: {predict:.2f})", icon="✅")
+    elif predict < 0.6:
+        st.error(f"Candidato :red[REPROVADO] (confiança: {predict:.2f})", icon="❌")
     else:
         st.warning("Resultado INCONCLUSÍVO", icon="⚠️")
 
@@ -160,6 +166,10 @@ def limpar_dados():
     # st.session_state.certificacoes = random.choice([])
     # st.session_state.outras_certificacoes = random.choice([])
 
+model = carregar_modelo()
+
+st.title("Análise de candidatos para vagas de trabalho")
+
 st.markdown("---")
 with st.expander("Simular dados"):
     col1, col2 = st.columns(2)
@@ -264,5 +274,19 @@ with st.form("form"):
 
     if submitted:
         with st.spinner("Avaliando candidato...", show_time=True):
-            time.sleep(5)
-            result("aprovado")
+            features = pd.DataFrame([{
+                "df_vg-vaga_sap": json_convert_sap[vaga_sap],
+                "df_vg-vaga_especifica_para_pcd": json_convert_pcd[vaga_pcd],
+                "df_vg-nivel profissional": json_convert_vaga_nivel_profissional[nivel_profissional_vaga],
+                "df_vg-nivel_academico": json_convert_vaga_nivel_academico[nivel_academico_vaga],
+                "df_vg-nivel_ingles": json_convert_ingles_espanhol[nivel_ingles_vaga],
+                "df_vg-nivel_espanhol": json_convert_ingles_espanhol[nivel_espanhol_vaga], 
+                "df_applics-pcd": json_convert_pcd[candidato_pcd],
+                "df_applics-nivel_profissional": json_convert_applicant_nivel_profissional[nivel_profissional_candidato],
+                "df_applics-nivel_academico": json_convert_applicant_nivel_academico[nivel_academico_candidato],
+                "df_applics-nivel_ingles": json_convert_ingles_espanhol[nivel_ingles_candidato],
+                "df_applics-nivel_espanhol": json_convert_ingles_espanhol[nivel_espanhol_candidato] 
+            }])
+            
+            pred = model.predict(features)
+            result(pred[0][0])
