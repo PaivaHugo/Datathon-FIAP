@@ -69,12 +69,107 @@ def simular_dados():
     st.session_state.cursos = random.choice([" ", "Relações Públicas", "Análise de Sistemas & Tecnologia da Informação", "Gestão de Negócios", "Publicidade"])
     # st.session_state.certificacoes = random.choice([])
     # st.session_state.outras_certificacoes = random.choice([])
-    
 
+def simular_dados_aprovado():
+    st.session_state.vaga_sap = "Não"
+    st.session_state.vaga_pcd = "Não"
+    st.session_state.nivel_profissional_vaga = "Sênior"
+    st.session_state.tipo_contratacao = "CLT Full"
+    st.session_state.area_atuação = "TI - Desenvolvimento/Programação-"
+    st.session_state.nivel_academico_vaga = "Ensino Superior Completo"
+    st.session_state.nivel_ingles_vaga = "Avançado"
+    st.session_state.nivel_espanhol_vaga = "Intermediário"
+    st.session_state.outro_idioma_vaga = " "
+    st.session_state.principais_atividades = " "
+    st.session_state.competencias_tecnicas_comportamentais = " "
+    st.session_state.habilidades_comportamentais = " "
+
+    st.session_state.titulo_profissional = "Analista de Sistemas/Analista Programador"
+    st.session_state.candidato_pcd = "Não"
+    st.session_state.remuneracao = 150
+    st.session_state.area_atuacao = "TI - Desenvolvimento/Programação-"
+    # st.session_state.conhecimento_tecnico = random.choice([])
+    st.session_state.cargo_atual = "Analista Programador (a)"
+    st.session_state.nivel_profissional_candidato = "Sênior"
+    st.session_state.nivel_academico_candidato = "Ensino Superior Completo"
+    st.session_state.nivel_ingles_candidato = "Avançado"
+    st.session_state.nivel_espanhol_candidato = "Intermediário"
+    st.session_state.outro_idioma_candidato = " "
+    st.session_state.instituicao_ensino_superior = " "
+    st.session_state.cursos = "Análise de Sistemas & Tecnologia da Informação"
+    # st.session_state.certificacoes = random.choice([])
+    # st.session_state.outras_certificacoes = random.choice([])  
+
+def simular_reprovado():
+    st.session_state.vaga_sap = "Não"
+    st.session_state.vaga_pcd = "Sim"
+    st.session_state.nivel_profissional_vaga = "Sênior"
+    st.session_state.tipo_contratacao = "CLT Full"
+    st.session_state.area_atuação = "Recursos Humanos-"
+    st.session_state.nivel_academico_vaga = "Ensino Superior Completo"
+    st.session_state.nivel_ingles_vaga = "Avançado"
+    st.session_state.nivel_espanhol_vaga = "Intermediário"
+    st.session_state.outro_idioma_vaga = " "
+    st.session_state.principais_atividades = " "
+    st.session_state.competencias_tecnicas_comportamentais = " "
+    st.session_state.habilidades_comportamentais = " "
+
+    st.session_state.titulo_profissional = "Analista de Sistemas/Analista Programador"
+    st.session_state.candidato_pcd = "Não"
+    st.session_state.remuneracao = 150
+    st.session_state.area_atuacao = "TI - Desenvolvimento/Programação-"
+    # st.session_state.conhecimento_tecnico = random.choice([])
+    st.session_state.cargo_atual = "Analista Programador (a)"
+    st.session_state.nivel_profissional_candidato = "Júnior"
+    st.session_state.nivel_academico_candidato = "Ensino Superior Incompleto"
+    st.session_state.nivel_ingles_candidato = "Nenhum"
+    st.session_state.nivel_espanhol_candidato = "Nenhum"
+    st.session_state.outro_idioma_candidato = " "
+    st.session_state.instituicao_ensino_superior = " "
+    st.session_state.cursos = "Análise de Sistemas & Tecnologia da Informação"
+    # st.session_state.certificacoes = random.choice([])
+    # st.session_state.outras_certificacoes = random.choice([])
+
+def limpar_dados():
+    st.session_state.vaga_sap = "Não"
+    st.session_state.vaga_pcd = "Não"
+    st.session_state.nivel_profissional_vaga = "Auxiliar"
+    st.session_state.tipo_contratacao = " "
+    st.session_state.area_atuação = " "
+    st.session_state.nivel_academico_vaga = "Ensino Fundamental Completo"
+    st.session_state.nivel_ingles_vaga = "Nenhum"
+    st.session_state.nivel_espanhol_vaga = "Nenhum"
+    st.session_state.outro_idioma_vaga = " "
+    st.session_state.principais_atividades = " "
+    st.session_state.competencias_tecnicas_comportamentais = " "
+    st.session_state.habilidades_comportamentais = " "
+
+    st.session_state.titulo_profissional = " "
+    st.session_state.candidato_pcd = "Não"
+    st.session_state.remuneracao = 0
+    st.session_state.area_atuacao = " "
+    st.session_state.conhecimento_tecnico = " "
+    st.session_state.cargo_atual = " "
+    st.session_state.nivel_profissional_candidato = "Auxiliar"
+    st.session_state.nivel_academico_candidato = "Ensino Fundamental Completo"
+    st.session_state.nivel_ingles_candidato = "Nenhum"
+    st.session_state.nivel_espanhol_candidato = "Nenhum"
+    st.session_state.outro_idioma_candidato = " "
+    st.session_state.instituicao_ensino_superior = " "
+    st.session_state.cursos = " "
+    # st.session_state.certificacoes = random.choice([])
+    # st.session_state.outras_certificacoes = random.choice([])
 
 st.markdown("---")
-st.write("Simular dados")
-st.button("Preencher dados aleatóriamente", on_click=simular_dados)
+with st.expander("Simular dados"):
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Simular candidato aprovado", on_click=simular_dados_aprovado, icon="✅")
+        st.button("Simular candidato reprovado", on_click=simular_reprovado, icon="❌")
+    with col2:
+        st.button("Preencher com dados aleatórios", on_click=simular_dados, icon="🎲")
+        st.button("Limpar formulário", on_click=limpar_dados)
+
 st.markdown("---")
 
 
@@ -122,14 +217,14 @@ with st.form("form"):
     st.markdown("---")
     st.write("Dados do Candidato")
     
-    col3, col4 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-    with col3:
+    with col1:
         titulo_profissional = st.text_input("Título profissional:", key="titulo_profissional")
         candidato_pcd = st.radio("Candidato PCD?", ["Não", "Sim"], horizontal=True, key="candidato_pcd")
 
 
-    with col4:
+    with col2:
         area_atuacao = st.text_input("Area de atuação:", key="area_atuacao")
         remuneracao = st.number_input("Remuneração:", key="remuneracao")
 
@@ -149,11 +244,11 @@ with st.form("form"):
        ], key="nivel_academico_candidato")
     
 
-    col5, col6 = st.columns(2)
-    with col5:
+    col1, col2 = st.columns(2)
+    with col1:
         nivel_ingles_candidato = st.selectbox("Nível de inglês do candidato:", ["Nenhum", "Básico", "Intermediário", "Avançado", "Fluente", "Técnico"], key="nivel_ingles_candidato")
     
-    with col6:
+    with col2:
         nivel_espanhol_candidato = st.selectbox("Nível de espanhol do candidato:", ["Nenhum", "Básico", "Intermediário", "Avançado", "Fluente", "Técnico"], key="nivel_espanhol_candidato")
     
     outro_idioma_candidato = st.text_input("Outro idioma do candidato:", key="outro_idioma_candidato")
