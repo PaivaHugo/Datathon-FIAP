@@ -176,6 +176,7 @@ scikit-learn==1.6.1
 scipy==1.14.1
 seaborn==0.13.2
 Send2Trash==1.8.3
+sentence-transformers==5.0.0
 setuptools==72.1.0
 simpy==4.1.1
 six==1.16.0

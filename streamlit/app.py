@@ -3,12 +3,18 @@ import random
 import joblib
 import pandas as pd
 
+from sentence_transformers import SentenceTransformer
 from utils import *
 
 # Carrega o modelo salvo
 @st.cache_resource
 def carregar_modelo():
     return joblib.load("streamlit/modelo.joblib")
+
+# Carrega o modelo salvo
+@st.cache_resource
+def carregar_modelo_embeddings():
+    return SentenceTransformer('neuralmind/bert-base-portuguese-cased')
 
 @st.dialog("Resultado da avaliação do candidato")
 def result(predict):
@@ -19,6 +25,18 @@ def result(predict):
     else:
         st.warning("Resultado INCONCLUSÍVO", icon="⚠️")
 
+def embbed_selected_columns(df, colunas):
+    print("Iniciando a geração de embeddings")
+    for col in colunas:
+        text = df[col].tolist()
+        embeddings = embedding_model.encode(text)
+
+        df[col] = list(embeddings)
+
+    return df
+
+
+
 def simular_dados():
     st.session_state.vaga_sap = random.choice(["Não", "Sim"])
     st.session_state.vaga_pcd = random.choice(["Não", "Sim"])
@@ -26,7 +44,7 @@ def simular_dados():
         "Auxiliar",  "Assistente", "Trainee", "Aprendiz", "Júnior", "Pleno", "Sênior", "Especialista", "Analista", "Líder", "Coordenador", "Supervisor", "Gerente"
         ])
     st.session_state.tipo_contratacao = random.choice([" ", "Cooperado", "CLT Full", "PJ/Autônomo", "Estagiário", ""])
-    st.session_state.area_atuação = random.choice([" ", "TI - Desenvolvimento/Programação-", "Recursos Humanos-", "TI - Arquitetura-", "Financeira/Controladoria-"])
+    st.session_state.area_atuacao_vaga = random.choice([" ", "TI - Desenvolvimento/Programação-", "Recursos Humanos-", "TI - Arquitetura-", "Financeira/Controladoria-"])
     st.session_state.nivel_academico_vaga = random.choice([
         "Ensino Fundamental Completo", "Ensino Médio Incompleto", "Ensino Médio Completo",
         "Ensino Técnico Cursando", "Ensino Técnico Incompleto", "Ensino Técnico Completo",
@@ -49,7 +67,7 @@ def simular_dados():
     st.session_state.titulo_profissional = random.choice([" ", "Scrum", "Analista de Sistemas/Analista Programador", "programação"])
     st.session_state.candidato_pcd = random.choice(["Não", "Sim"])
     st.session_state.remuneracao = random.choice([0, 85, 150, 40, 25])
-    st.session_state.area_atuacao = random.choice([" ", "Marketing-", "TI - Desenvolvimento/Programação-", "Gestão e Alocação de Recursos de TI-TI - Processos e Negócios-", "Administrativa-Financeira/Controladoria-"])
+    st.session_state.area_atuacao_candidato = random.choice([" ", "Marketing-", "TI - Desenvolvimento/Programação-", "Gestão e Alocação de Recursos de TI-TI - Processos e Negócios-", "Administrativa-Financeira/Controladoria-"])
     # st.session_state.conhecimento_tecnico = random.choice([])
     st.session_state.cargo_atual = random.choice([" ", "Analista Programador (a)", "Analista Desenvolvedor", "Consultor (a) SAP MM Sênior"])
     st.session_state.nivel_profissional_candidato = random.choice([
@@ -81,7 +99,7 @@ def simular_dados_aprovado():
     st.session_state.vaga_pcd = "Não"
     st.session_state.nivel_profissional_vaga = "Sênior"
     st.session_state.tipo_contratacao = "CLT Full"
-    st.session_state.area_atuação = "TI - Desenvolvimento/Programação-"
+    st.session_state.area_atuacao_vaga = "TI - Desenvolvimento/Programação-"
     st.session_state.nivel_academico_vaga = "Ensino Superior Completo"
     st.session_state.nivel_ingles_vaga = "Avançado"
     st.session_state.nivel_espanhol_vaga = "Intermediário"
@@ -93,7 +111,7 @@ def simular_dados_aprovado():
     st.session_state.titulo_profissional = "Analista de Sistemas/Analista Programador"
     st.session_state.candidato_pcd = "Não"
     st.session_state.remuneracao = 150
-    st.session_state.area_atuacao = "TI - Desenvolvimento/Programação-"
+    st.session_state.area_atuacao_candidato = "TI - Desenvolvimento/Programação-"
     # st.session_state.conhecimento_tecnico = random.choice([])
     st.session_state.cargo_atual = "Analista Programador (a)"
     st.session_state.nivel_profissional_candidato = "Sênior"
@@ -103,6 +121,7 @@ def simular_dados_aprovado():
     st.session_state.outro_idioma_candidato = " "
     st.session_state.instituicao_ensino_superior = " "
     st.session_state.cursos = "Análise de Sistemas & Tecnologia da Informação"
+    # st.session_state.certificacoes = "Análise de Sistemas & Tecnologia da Informação"
     # st.session_state.certificacoes = random.choice([])
     # st.session_state.outras_certificacoes = random.choice([])  
 
@@ -111,7 +130,7 @@ def simular_reprovado():
     st.session_state.vaga_pcd = "Sim"
     st.session_state.nivel_profissional_vaga = "Sênior"
     st.session_state.tipo_contratacao = "CLT Full"
-    st.session_state.area_atuação = "Recursos Humanos-"
+    st.session_state.area_atuacao_vaga = "Recursos Humanos-"
     st.session_state.nivel_academico_vaga = "Ensino Superior Completo"
     st.session_state.nivel_ingles_vaga = "Avançado"
     st.session_state.nivel_espanhol_vaga = "Intermediário"
@@ -123,7 +142,7 @@ def simular_reprovado():
     st.session_state.titulo_profissional = "Analista de Sistemas/Analista Programador"
     st.session_state.candidato_pcd = "Não"
     st.session_state.remuneracao = 150
-    st.session_state.area_atuacao = "TI - Desenvolvimento/Programação-"
+    st.session_state.area_atuacao_candidato = "TI - Desenvolvimento/Programação-"
     # st.session_state.conhecimento_tecnico = random.choice([])
     st.session_state.cargo_atual = "Analista Programador (a)"
     st.session_state.nivel_profissional_candidato = "Júnior"
@@ -141,7 +160,7 @@ def limpar_dados():
     st.session_state.vaga_pcd = "Não"
     st.session_state.nivel_profissional_vaga = "Auxiliar"
     st.session_state.tipo_contratacao = " "
-    st.session_state.area_atuação = " "
+    st.session_state.area_atuacao_vaga = " "
     st.session_state.nivel_academico_vaga = "Ensino Fundamental Completo"
     st.session_state.nivel_ingles_vaga = "Nenhum"
     st.session_state.nivel_espanhol_vaga = "Nenhum"
@@ -153,7 +172,7 @@ def limpar_dados():
     st.session_state.titulo_profissional = " "
     st.session_state.candidato_pcd = "Não"
     st.session_state.remuneracao = 0
-    st.session_state.area_atuacao = " "
+    st.session_state.area_atuacao_candidato = " "
     st.session_state.conhecimento_tecnico = " "
     st.session_state.cargo_atual = " "
     st.session_state.nivel_profissional_candidato = "Auxiliar"
@@ -167,6 +186,7 @@ def limpar_dados():
     # st.session_state.outras_certificacoes = random.choice([])
 
 model = carregar_modelo()
+embedding_model = carregar_modelo_embeddings()
 
 st.title("Análise de candidatos para vagas de trabalho")
 
@@ -178,7 +198,7 @@ with st.expander("Simular dados"):
         st.button("Simular candidato reprovado", on_click=simular_reprovado, icon="❌")
     with col2:
         st.button("Preencher com dados aleatórios", on_click=simular_dados, icon="🎲")
-        st.button("Limpar formulário", on_click=limpar_dados)
+        st.button("Limpar formulário", on_click=limpar_dados, icon="🧹")
 
 st.markdown("---")
 
@@ -214,7 +234,7 @@ with st.form("form"):
             "Mestrado Cursando",  "Pós Graduação Incompleto", "Mestrado Completo"
             ], key="nivel_academico_vaga")
         
-        area_atuação = st.text_input("Área de atuação:", key="area_atuação")
+        area_atuacao_vaga = st.text_input("Área de atuação:", key="area_atuacao_vaga")
         habilidades_comportamentais = st.text_input("Habilidades comportamentais necessárias:", key="habilidades_comportamentais")
         nivel_espanhol_vaga = st.selectbox("Nível de espanhol da vaga:", ["Nenhum", "Básico", "Intermediário", "Avançado", "Fluente", "Técnico"], key="nivel_espanhol_vaga")
     
@@ -235,7 +255,7 @@ with st.form("form"):
 
 
     with col2:
-        area_atuacao = st.text_input("Area de atuação:", key="area_atuacao")
+        area_atuacao_candidato = st.text_input("Area de atuação:", key="area_atuacao_candidato")
         remuneracao = st.number_input("Remuneração:", key="remuneracao")
 
 
@@ -269,24 +289,41 @@ with st.form("form"):
     outras_certificacoes = st.text_input("Outras certificações:", key="outras_certificacoes")
 
 
-
     submitted = st.form_submit_button("Avaliar candidato")
 
     if submitted:
         with st.spinner("Avaliando candidato...", show_time=True):
-            features = pd.DataFrame([{
-                "df_vg-vaga_sap": json_convert_sap[vaga_sap],
-                "df_vg-vaga_especifica_para_pcd": json_convert_pcd[vaga_pcd],
-                "df_vg-nivel profissional": json_convert_vaga_nivel_profissional[nivel_profissional_vaga],
-                "df_vg-nivel_academico": json_convert_vaga_nivel_academico[nivel_academico_vaga],
-                "df_vg-nivel_ingles": json_convert_ingles_espanhol[nivel_ingles_vaga],
-                "df_vg-nivel_espanhol": json_convert_ingles_espanhol[nivel_espanhol_vaga], 
-                "df_applics-pcd": json_convert_pcd[candidato_pcd],
-                "df_applics-nivel_profissional": json_convert_applicant_nivel_profissional[nivel_profissional_candidato],
-                "df_applics-nivel_academico": json_convert_applicant_nivel_academico[nivel_academico_candidato],
-                "df_applics-nivel_ingles": json_convert_ingles_espanhol[nivel_ingles_candidato],
-                "df_applics-nivel_espanhol": json_convert_ingles_espanhol[nivel_espanhol_candidato] 
-            }])
+            features = {
+                    "df_vg-vaga_sap": vaga_sap,
+                    "df_vg-tipo_contratacao": tipo_contratacao,
+                    "df_vg-vaga_especifica_para_pcd": vaga_pcd,
+                    "df_vg-nivel profissional": nivel_profissional_vaga,
+                    "df_vg-nivel_academico": nivel_academico_vaga,
+                    "df_vg-nivel_ingles": nivel_ingles_vaga,
+                    "df_vg-nivel_espanhol": nivel_espanhol_vaga,
+                    "df_vg-outro_idioma": outro_idioma_vaga,
+                    "df_vg-areas_atuacao": area_atuacao_vaga,
+                    "df_vg-principais_atividades": principais_atividades,
+                    "df_vg-competencia_tecnicas_e_comportamentais": competencias_tecnicas_comportamentais,
+                    "df_vg-habilidades_comportamentais_necessarias": habilidades_comportamentais,
+                    "df_applics-titulo_profissional": titulo_profissional,
+                    "df_applics-pcd": candidato_pcd,
+                    "df_applics-area_atuacao": area_atuacao_candidato,
+                    "df_applics-remuneracao": remuneracao,
+                    "df_applics-conhecimentos_tecnicos": conhecimento_tecnico,
+                    "df_applics-cargo_atual": cargo_atual,
+                    "df_applics-nivel_profissional": nivel_profissional_candidato,
+                    "df_applics-nivel_academico": nivel_academico_candidato,
+                    "df_applics-nivel_ingles": nivel_ingles_candidato,
+                    "df_applics-nivel_espanhol": nivel_espanhol_candidato,
+                    "df_applics-outro_idioma": outro_idioma_candidato,
+                    "df_applics-instituicao_ensino_superior": instituicao_ensino_superior,
+                    "df_applics-cursos": cursos,
+                    "df_applics-certificacoes": certificacoes,
+                    "df_applics-outras_certificacoes": outras_certificacoes
+                }
+
+            features = embbed_selected_columns(features, features.columns)
             
             pred = model.predict(features)
             result(pred[0][0])
