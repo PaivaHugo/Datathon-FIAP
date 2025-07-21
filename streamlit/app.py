@@ -4,7 +4,6 @@ import joblib
 import pandas as pd
 
 from sentence_transformers import SentenceTransformer
-from utils import *
 
 # Carrega o modelo salvo
 @st.cache_resource
