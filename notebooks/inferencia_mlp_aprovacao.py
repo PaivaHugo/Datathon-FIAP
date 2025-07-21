@@ -46,7 +46,7 @@ def avalia_nivel_ingles_candidato_vs_vaga(nivel_vaga, nivel_candidato):
             n_candidato = k
             break
 
-    if n_candidato >= n_vaga:
+    if n_candidato >= n_vaga or ( n_vaga > n_candidato and (n_vaga - n_candidato) <= 2 ):
         return 1
     else:
         return 0
@@ -65,7 +65,60 @@ def avalia_area_atuacao_candidato_vs_vaga(areas_vaga, areas_candidato):
 
 
 def avalia_nivel_profissional_candidato_vs_vaga(nivel_vaga, nivel_candidato):
-    if nivel_candidato == nivel_vaga:
+    nivel_profissional = {
+    "": 0,
+    "Trainee": 1,
+    "Aprendiz": 2,
+    "Auxiliar": 3, 
+    "Estagiário": 4,
+    "Assistente": 5,
+    "Técnico de Nível Médio": 6,
+    "Júnior": 7,
+    "Pleno": 8,
+    "Sênior": 9,
+    "Analista": 10,
+    "Especialista": 11,
+    "Líder": 12,
+    "Supervisor": 13,
+    "Coordenador": 14,
+    "Gerente": 15
+    }
+    if nivel_candidato == "" or nivel_profissional[nivel_candidato] >= nivel_profissional[nivel_vaga] :
+        return 1
+    else:
+        return 0
+
+
+def avalia_nivel_academico_candidato_vs_vaga(nivel_vaga, nivel_candidato):
+    nivel_academico = {
+    '': 0,
+    'Ensino Fundamental Incompleto': 1,
+    'Ensino Fundamental Cursando': 2,
+    "Ensino Fundamental Completo": 3,
+    "Ensino Médio Incompleto": 4,
+    'Ensino Médio Cursando': 5,
+    "Ensino Médio Completo": 6,
+    "Ensino Técnico Incompleto": 7,
+    "Ensino Técnico Cursando": 8,
+    "Ensino Técnico Completo": 9,
+    "Ensino Superior Incompleto": 10,
+    "Ensino Superior Cursando": 11,
+    "Ensino Superior Completo": 12,
+    "Pós Graduação Incompleto": 13,
+    "Pós Graduação Cursando": 14,
+    "Pós Graduação Completo": 15,
+    'Mestrado Incompleto': 16,
+    "Mestrado Cursando": 17, 
+    "Mestrado Completo": 18,  
+    'Doutorado Incompleto': 19, 
+    'Doutorado Cursando': 20, 
+    'Doutorado Completo': 21
+    }
+    # if nivel_candidato == nivel_vaga
+    n_candidato = nivel_academico[nivel_candidato]
+    n_vaga = nivel_academico[nivel_vaga]
+    
+    if nivel_candidato == "" or n_candidato >= n_vaga or ( n_vaga > n_candidato and (n_vaga - n_candidato) <= 2 ):
         return 1
     else:
         return 0
@@ -105,13 +158,20 @@ def prever_aprovacao(df_novo: pd.DataFrame):
     df_novo["match_ingles"] = df_novo.apply(
     lambda row: avalia_nivel_ingles_candidato_vs_vaga(row['df_vg-nivel_ingles'], row['df_applics-nivel_ingles']), axis=1)
 
+    df_novo["match_espanhol"] = df_novo.apply(
+    lambda row: avalia_nivel_ingles_candidato_vs_vaga(row['df_vg-nivel_espanhol'], row['df_applics-nivel_espanhol']), axis=1)
+
     df_novo["match_area_atuacao"] = df_novo.apply(
     lambda row: avalia_area_atuacao_candidato_vs_vaga(row['df_vg-areas_atuacao'], row['df_applics-area_atuacao']), axis=1)
 
     df_novo["match_nivel_profissional"] = df_novo.apply(
     lambda row: avalia_nivel_profissional_candidato_vs_vaga(row['df_vg-nivel profissional'], row['df_applics-nivel_profissional']), axis=1)
 
-    X_match = df_novo[['match_ingles','match_area_atuacao','match_nivel_profissional']].values
+    df_novo["match_nivel_academico"] = df_novo.apply(
+    lambda row: avalia_nivel_academico_candidato_vs_vaga(row['df_vg-nivel_academico'], row['df_applics-nivel_academico']), axis=1)
+
+
+    X_match = df_novo[['match_ingles','match_espanhol','match_area_atuacao','match_nivel_profissional','match_nivel_academico']].values
 
     # Concatenação final
     #X = np.concatenate([emb_vaga, emb_candidato, sim_vaga_candidato, X_cat, X_num, X_match], axis=1)
@@ -132,6 +192,6 @@ def prever_aprovacao(df_novo: pd.DataFrame):
     })
 
 if __name__ == '__main__':
-    df_exemplo = pd.read_json('teste4.json')
+    df_exemplo = pd.read_json('teste3.json')
     resultado = prever_aprovacao(df_exemplo)
     print(resultado)
