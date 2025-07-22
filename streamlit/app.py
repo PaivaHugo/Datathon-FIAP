@@ -1,38 +1,41 @@
 import streamlit as st
 import random
-import joblib
 import pandas as pd
 
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
+from pipeline_inferencia import PipelineInferência
+inferencia = PipelineInferência()
 
 # Carrega o modelo salvo
-@st.cache_resource
-def carregar_modelo():
-    return joblib.load("streamlit/modelo.joblib")
+# @st.cache_resource
+# def carregar_modelo():
+    
+    # return joblib.load("streamlit/modelo.joblib")
+
 
 # Carrega o modelo salvo
-@st.cache_resource
-def carregar_modelo_embeddings():
-    return SentenceTransformer('neuralmind/bert-base-portuguese-cased')
+# @st.cache_resource
+# def carregar_modelo_embeddings():
+#     return SentenceTransformer('neuralmind/bert-base-portuguese-cased')
 
 @st.dialog("Resultado da avaliação do candidato")
 def result(predict):
-    if predict >= 0.6:
-        st.success(f"Candidato :green[APROVADO] (confiança: {predict:.2f})", icon="✅")
-    elif predict < 0.6:
-        st.error(f"Candidato :red[REPROVADO] (confiança: {predict:.2f})", icon="❌")
+    if predict.loc["classe_prevista", "resultado"] == 1:
+        st.success(f"Candidato :green[APROVADO] (confiança: {predict.loc["probabilidade_aprovacao", "resultado"]})", icon="✅")
+    elif predict.loc["classe_prevista", "resultado"] == 0:
+        st.error(f"Candidato :red[REPROVADO] (confiança: {predict.loc["probabilidade_aprovacao", "resultado"]})", icon="❌")
     else:
         st.warning("Resultado INCONCLUSÍVO", icon="⚠️")
 
-def embbed_selected_columns(df, colunas):
-    print("Iniciando a geração de embeddings")
-    for col in colunas:
-        text = df[col].tolist()
-        embeddings = embedding_model.encode(text)
+# def embbed_selected_columns(df, colunas):
+#     print("Iniciando a geração de embeddings")
+#     for col in colunas:
+#         text = df[col].tolist()
+#         embeddings = embedding_model.encode(text)
 
-        df[col] = list(embeddings)
+#         df[col] = list(embeddings)
 
-    return df
+#     return df
 
 
 
@@ -184,8 +187,8 @@ def limpar_dados():
     # st.session_state.certificacoes = random.choice([])
     # st.session_state.outras_certificacoes = random.choice([])
 
-model = carregar_modelo()
-embedding_model = carregar_modelo_embeddings()
+# model = carregar_modelo()
+# embedding_model = carregar_modelo_embeddings()
 
 st.title("Análise de candidatos para vagas de trabalho")
 
@@ -322,7 +325,11 @@ with st.form("form"):
                     "df_applics-outras_certificacoes": outras_certificacoes
                 }
 
-            features = embbed_selected_columns(features, features.columns)
+            # features = embbed_selected_columns(features, features.columns)
             
-            pred = model.predict(features)
-            result(pred[0][0])
+            # pred = model.predict(features)
+            # result(pred[0][0])
+
+            resultado = inferencia.prever_aprovacao(pd.DataFrame({"candidato": features}))
+            print(resultado)
+            result(resultado)
