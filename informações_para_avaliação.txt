@@ -2,9 +2,5 @@
 https://github.com/PaivaHugo/Datathon-FIAP
 
 
-## Link do vídeo da explicação
-
-
-
 ## Link do da aplicação deployada no stramlit
 https://avaliar-candidato.streamlit.app/
