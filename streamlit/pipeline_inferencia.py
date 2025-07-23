@@ -7,9 +7,9 @@ from keras.models import load_model
 
 class PipelineInferência():
     def __init__(self):
-        self.model = load_model('modelo_mlp_aprovacao.h5')
-        self. encoder = joblib.load('encoder_categorias.joblib')
-        self.scaler = joblib.load('scaler_remuneracao.joblib')
+        self.model = load_model('streamlit/modelo_mlp_aprovacao.h5')
+        self. encoder = joblib.load('streamlit/encoder_categorias.joblib')
+        self.scaler = joblib.load('streamlit/scaler_remuneracao.joblib')
 
     # Função utilitária para extrair remuneração
     def extrair_valor(self, texto):
